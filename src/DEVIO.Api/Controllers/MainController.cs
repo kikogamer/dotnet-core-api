@@ -2,6 +2,7 @@
 using DevIO.Business.Notificacoes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Linq;
 
 namespace DEVIO.Api.Controllers
@@ -10,10 +11,21 @@ namespace DEVIO.Api.Controllers
     public abstract class MainController : ControllerBase
     {
         private readonly INotificador _notificador;
+        public readonly IUser AppUser;
+        protected Guid UsuarioId { get; set; }
+        protected bool UsuarioAutenticado { get; set; }
 
-        public MainController(INotificador notificador)
+        public MainController(INotificador notificador,
+                              IUser appUser)
         {
             _notificador = notificador;
+            AppUser = appUser;
+
+            if (appUser.IsAuthenticated())
+            {
+                UsuarioId = appUser.GetUserId();
+                UsuarioAutenticado = true;
+            }
         }
 
         protected ActionResult CustomResponse(ModelStateDictionary modelState)
